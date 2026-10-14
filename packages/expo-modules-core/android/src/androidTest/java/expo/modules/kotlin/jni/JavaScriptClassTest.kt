@@ -17,6 +17,19 @@ class JavaScriptClassTest {
   }
 
   @Test
+  fun classes_have_their_names_and_distinct_constructors() = withSingleModule({
+    Class("FirstClass")
+    Class("SecondClass")
+  }) {
+    val first = "$moduleRef.FirstClass"
+    val second = "$moduleRef.SecondClass"
+    val result = evaluateScript(
+      "[$first.name, $second.name, $first !== $second, $first.prototype !== $second.prototype, new $first() instanceof $second].join()"
+    ).getString()
+    Truth.assertThat(result).isEqualTo("FirstClass,SecondClass,true,true,false")
+  }
+
+  @Test
   fun has_keys_in_prototype() = withSingleModule({
     Class("MyClass") {
       Function("myFunction") { }
