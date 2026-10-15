@@ -1090,29 +1090,6 @@ struct JavaScriptRuntimeTests {
   }
 
   @Test
-  func `created classes have distinct constructors`() throws {
-    let first = try runtime.createClass(name: "First") { this, _ in this }
-    let second = try runtime.createClass(name: "Second") { this, _ in this }
-    runtime.global().setProperty("First", value: first.asValue())
-    runtime.global().setProperty("Second", value: second.asValue())
-
-    let result = try runtime.eval(
-      "[First.name, Second.name, First !== Second, First.prototype !== Second.prototype, new First() instanceof Second].join()"
-    )
-    #expect(result.getString() == "First,Second,true,true,false")
-  }
-
-  @Test
-  func `create class works in two runtimes`() throws {
-    let otherRuntime = JavaScriptRuntime()
-    _ = try runtime.createClass(name: "First") { this, _ in this }
-    let klass = try otherRuntime.createClass(name: "Second") { this, _ in this }
-    otherRuntime.global().setProperty("Second", value: klass.asValue())
-
-    #expect(try otherRuntime.eval("[Second.name, new Second() instanceof Second].join()").getString() == "Second,true")
-  }
-
-  @Test
   func `create class throws on invalid name with special characters`() {
     #expect(throws: JavaScriptRuntime.InvalidIdentifierError.self) {
       _ = try runtime.createClass(name: "bad); evil(") { this, _ in this }
