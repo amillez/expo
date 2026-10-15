@@ -323,7 +323,7 @@ open class JavaScriptRuntime: Equatable, Identifiable, @unchecked Sendable {
     _ constructor: @escaping SyncFunctionClosure
   ) throws -> JavaScriptFunction {
     // Host functions are not standard functions, thus cannot be used as class constructors.
-    // We're creating one with a JS function that calls a "native constructor" that is a host function.
+    // We're creating one by evaluating a script that calls a "native constructor" that is a host function.
     let nativeConstructorKey = "__native_constructor__"
 
     if name.wholeMatch(of: /^[a-zA-Z_$][a-zA-Z0-9_$]*$/) == nil {
@@ -1025,8 +1025,8 @@ private let classFactoryKey = JavaScriptRuntime.Cache.Key<JavaScriptFunction.Ref
 // MARK: - Errors
 
 extension JavaScriptRuntime {
-  /// Thrown when an API that takes a JavaScript identifier, such as ``createClass(name:inheriting:_:)``,
-  /// receives a string that is not a valid identifier.
+  /// Thrown when an invalid JavaScript identifier is passed to APIs that interpolate
+  /// the name into evaluated JavaScript source, such as ``createClass(name:inheriting:_:)``.
   public struct InvalidIdentifierError: Error, CustomStringConvertible {
     /// The identifier string that failed validation.
     public let identifier: String
